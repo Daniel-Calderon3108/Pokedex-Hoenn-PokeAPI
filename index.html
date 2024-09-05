@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Pokedex Hoenn</title>
+        <!-- Logo del sitio web -->
+        <link rel="shortcut icon" href="img/logoPagina.png" type="image/x-icon">
+        <!-- Estilos de la pokedex -->
+        <link rel="stylesheet" href="css/styles.css">
+        <!-- Font Awesome -->
+        <script src="https://kit.fontawesome.com/6955cb7bc8.js"
+            crossorigin="anonymous"></script>
+        <!-- JQuery -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    </head>
+    <body>
+        <section class="title">
+            <h1>POKÉDEX HOENN</h1>
+        </section>
+        <section class="pokedex-container">
+            <article class="info">
+                <article>
+                    <h2>AVISTADOS</h2>
+                    <div><p>HOENN</p><p id="view"></p></div>
+                    <h2>ATRAPADOS</h2>
+                    <div><p>HOENN</p><p id="catch"></p></div>
+                </article>
+                <article>
+                    <div class="button">
+                        <button>C</button>
+                        <p>SHINY/NORMAL</p>
+                    </div>
+                    <div class="button">
+                        <div class="button-up-down">
+                            <button><i
+                                    class="fa-solid fa-arrow-up"></i></button>
+                            <button><i
+                                    class="fa-solid fa-arrow-down"></i></button>
+                        </div>
+                        <p>SUBIR/BAJAR</p>
+                    </div>
+                    <div class="button">
+                        <button>ENTER <i
+                                class="fa-solid fa-arrow-left"></i></button>
+                        <p>INFORMACIÓN</p>
+                    </div>
+                    <div class="button">
+                        <button>BACKSPACE <i
+                                class="fa-solid fa-arrow-turn-down"></i></button>
+                        <p>BUSCAR</p>
+                    </div>
+                </article>
+            </article>
+            <article class="sprite">
+                <article class="up"></article>
+                <article class="img-pokemon" id="pokemon-sprite"></article>
+                <input type="hidden" id="pokemon-view">
+                <article class="down"><i class="fa-solid fa-star"
+                        onclick="showHideShinyPokemon()"></i></article>
+            </article>
+            <article class="list" id="list"></article>
+        </section>
+        <section class="info-pokemon hide" id="show-info">
+            <nav class="nav-info">
+                <ul>
+                    <li><button
+                            onclick="changeSection('general')">GENERAL</button></li>
+                    <li><button
+                            onclick="changeSection('evo')">EVOLUCIÓN</button></li>
+                    <li><button
+                            onclick="changeSection('movs')">MOVIMIENTOS</button></li>
+                    <li><button
+                            onclick="changeSection('stats')">STATS</button></li>
+                    <li><button class="exit"
+                            onclick="showHideInfo()">CERRAR</button></li>
+                </ul>
+            </nav>
+            <section id="sections-info">
+                <section id="general">
+                    <article class="card-general">
+                        <div class="sprite-info" id="sprite-info"></div>
+                        <div class="general-info" id="general-info">
+                            <div class="pokemon-info">
+                                <p id="name-pokemon"></p>
+                                <p class="type" id="type-pokemon"></p>
+                                <p><i class="fa-solid fa-star"
+                                        onclick="showHideShinyPokemon()"></i></p>
+                            </div>
+                            <div class="weight-height">
+                                <p>ALTURA</p>
+                                <p id="weight"></p>
+                            </div>
+                            <div class="weight-height">
+                                <p>PESO</p>
+                                <p id="height"></p>
+                            </div>
+                            <div class="weight-height">
+                                <p>POSIBLES HABILIDADES</p>
+                                <p id="abilities"></p>
+                            </div>
+                            <div class="weight-height">
+                                <p>OBJETOS</p>
+                                <p id="held-item"></p>
+                            </div>
+                        </div>
+                    </article>
+                    <article class="description">
+                        <div class="left"></div>
+                        <div class="center" id="description"></div>
+                        <div class="right"></div>
+                    </article>
+                </section>
+                <section id="evo" class="hide">
+                    <article class="evolution-chain">
+                        <span id="evo-sprites"></span>
+                        <p>Linea evolutiva de <span id="name-evo"></span></p>
+                    </article>
+                    <article class="card-description"
+                        id="evolution_chain"></article>
+                </section>
+                <section id="movs" class="hide">
+                    <article class="learn-moves">
+                        <span id="movs-sprite"></span>
+                        <p>Movimientos que puede aprender <span
+                                id="name-mov"></span></p>
+                    </article>
+                    <article class="card-movs" id="learn_moves"></article>
+                </section>
+                <section id="stats" class="hide">
+                    <article class="card-stats" id="card-stats">
+                        <div>
+                            <div class="stats-sprite" id="stats-sprite"></div>
+                        </div>
+                        <div class="stats-pokemon">
+                            <p class="title-stats">Stats de <span
+                                    id="name-stats"></span></p>
+                            <div class="stats">
+                                <div class="stats-info"><p>HP <span
+                                            id="hp"></span></p><p
+                                        class="bar-stat"><span
+                                            id="hp-bar"></span></p></div>
+                                <div class="stats-info"><p>ATK <span
+                                            id="attack"></span></p><p
+                                        class="bar-stat"><span
+                                            id="attack-bar"></span></p></div>
+                                <div class="stats-info"><p>DEF <span
+                                            id="defense"></span></p><p
+                                        class="bar-stat"><span
+                                            id="defense-bar"></span></p></div>
+                                <div class="stats-info"><p>ATK.ESP <span
+                                            id="special-attack"></span></p><p
+                                        class="bar-stat"><span
+                                            id="special-attack-bar"></span></p></div>
+                                <div class="stats-info"><p>DEF.ESP <span
+                                            id="special-defense"></span></p><p
+                                        class="bar-stat"><span
+                                            id="special-defense-bar"></span></p></div>
+                                <div class="stats-info"><p>VEL <span
+                                            id="speed"></span></p><p
+                                        class="bar-stat"><span
+                                            id="speed-bar"></span></p></div>
+                                <div class="stats-info"><p>TOTAL</p><p
+                                        id="total"></p></div>
+                            </div>
+                        </div>
+                    </article>
+                </section>
+            </section>
+        </section>
+        <section class="search-pokemon hide" id="show-search">
+            <nav class="nav-search">
+                <h1>BUSQUEDA DE POKEMON</h1>
+                <ul>
+                    <li><button class="exit"
+                            onclick="showHideSearch()">CERRAR</button></li>
+                </ul>
+            </nav>
+            <section class="container-search-principal">
+                <section class="container-search">
+                    <div class="button" onclick="changeSectionSearch('name-search-select')">
+                        <p>NOMBRE</p>
+                        <input type="text" id="name-search" readonly="true"
+                            value="TODOS">
+                    </div>
+                    <div class="button" onclick="changeSectionSearch('color-search-select')">
+                        <p>COLOR</p>
+                        <input type="text" id="color-search" readonly="true"
+                            value="TODOS">
+                    </div>
+                    <div class="button" onclick="changeSectionSearch('type-search-select')">
+                        <p>TIPO</p>
+                        <input type="text" id="type-search" readonly="true"
+                            value="TODOS">
+                    </div>
+                    <div class="button" onclick="changeSectionSearch('order-search-select')">
+                        <p>ORDEN</p>
+                        <input type="text" id="order-search" readonly="true"
+                            value="POR NUMERO ENTRADA">
+                    </div>
+                    <div class="button" onclick="changeSectionSearch('type-order-search-select')">
+                        <p>TIPO ORDEN</p>
+                        <input type="text" id="type-order-search"
+                            readonly="true" value="ASCENDENTE">
+                    </div>
+                    <div class="button">
+                        <p id="search-button" onclick="sendSearch()">BUSCAR</p>
+                        <span id="search-result"></span>
+                    </div>
+                </section>
+                <section class="container-info">
+                    <div class="search-info" id="search-info">
+                        <section id="name-search-select"></section>
+                        <section id="color-search-select" class="hide">POR COLOR</section>
+                        <section id="type-search-select" class="hide">POR TIPO</section>
+                        <section id="order-search-select" class="hide">
+                            <p class="active" onclick="changeSelection('order-search','POR NUMERO ENTRADA')">POR NUMERO ENTRADA</p>
+                            <p onclick="changeSelection('order-search','POR NOMBRE')">POR NOMBRE</p>
+                        </section>
+                        <section id="type-order-search-select" class="hide">
+                            <p class="active" onclick="changeSelection('type-order-search', 'ASCENDENTE')">ASCENDENTE</p>
+                            <p onclick="changeSelection('type-order-search','DESCENDENTE')">DESCENDENTE</p>
+                        </section>
+                    </div>
+                </section>
+            </section>
+            <section class="description">
+                <div class="left"></div>
+                <div class="center" id="description-search">Buscar pokemon por los parametros establecidos.</div>
+                <div class="right"></div>
+            </section>
+        </section>
+    </body>
+    <!-- JS Pokedex -->
+    <script src="js/app.js"></script>
+</html>
