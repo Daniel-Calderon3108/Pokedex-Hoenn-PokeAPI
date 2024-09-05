@@ -192,11 +192,8 @@ async function getInfoPokemon(name, id, newPosition = null) {
     let list = document.getElementById("list").children
     // Recorrer todos los pokemon
     for (let i = 0; i < list.length; i++) {
-        // Quitar las clases active
-        list[i].classList.remove("active")
-
         // Agregar la clase active, si el id del pokemon corresponde, con el pokemon de la pokedex
-        if (list[i].children[2].id == id) list[i].classList.add("active")
+        list[i].children[2].id == id ? list[i].classList.add("active") : list[i].classList.remove("active")
     }
 
     let typePokemon = ``
@@ -244,6 +241,8 @@ async function getInfoPokemon(name, id, newPosition = null) {
     // Pintamos todas las stats del pokemon
     printStatsPokemon(DATA.stats)
 
+    name = name.toUpperCase()
+
     // Obtener id del pokemon seleccionado
     $("#pokemon-view").val(parseInt(id))
     $("#type-pokemon").html(typePokemon)
@@ -251,9 +250,9 @@ async function getInfoPokemon(name, id, newPosition = null) {
     $("#height").html(DATA.height + "g")
     $("#abilities").html(abilitiesPokemon.substring(0, abilitiesPokemon.length - 1))
     $("#held-item").html(heldItemsPokemon.substring(0, heldItemsPokemon.length - 1))
-    $("#name-evo").html(name.toUpperCase())
-    $("#name-mov").html(name.toUpperCase())
-    $("#name-stats").html(name.toUpperCase())
+    $("#name-evo").html(name)
+    $("#name-mov").html(name)
+    $("#name-stats").html(name)
 }
 
 // Función para obtener descripcion del pokemon y nombre
@@ -290,17 +289,16 @@ async function getDescriptionPokemon(name) {
 
 // Funcion para obtener informacion avanzada de los movimientos que aprenden los pokemon
 async function getMovePokemon(url, move_learn_method, level) {
-    let movsInfo = []
     // Realizamos la peticion y obtenemos la data
     const DATA = await performApiQuery(url)
 
-    movsInfo.name = DATA.name // Obtenemos el nombre del movimiento
-    movsInfo.category = DATA.damage_class.name // Obtenemos la categoria a la que pertenece el movimiento
-    movsInfo.type = DATA.type.name // Obtenemos el tipo del movimiento
-    movsInfo.move_learn_method = move_learn_method // Obtenemos el metodo por el cual el pokemon puede aprender el movimiento 
-    movsInfo.level = level // Obtenemos a que nivel el pokemon puede aprender el movimiento 
-
-    return movsInfo
+    return {
+        name : DATA.name, // Obtenemos el nombre del movimiento
+        category : DATA.damage_class.name, // Obtenemos la categoria a la que pertenece el movimiento
+        type : DATA.type.name, // Obtenemos el tipo del movimiento
+        move_learn_method : move_learn_method, // Obtenemos el metodo por el cual el pokemon puede aprender el movimiento
+        level : level // Obtenemos a que nivel el pokemon puede aprender el movimiento
+    }
 }
 
 // Funcion que se encarga de clasificar y pintar los movimientos de los pokemon
@@ -562,18 +560,18 @@ function changeSectionSearch(section) {
 
     let sections = document.getElementById("search-info").children
 
-    // Recorrer todas las secciones y agregar la clase hide
+    // Recorrer todas las secciones
     for (let i = 0; i < sections.length; i++) {
-        sections[i].classList.add("hide")
+        sections[i].id == section ? sections[i].classList.remove("hide") : sections[i].classList.add("hide")
     }
 
-    document.getElementById(section).classList.remove("hide") // Quitar clase hide a la seccion seleccionada
     $("#description-search").html(descriptions[section])
 }
 
 // Funcion para imprimir las letras
 function printLetter() {
-    let letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "X", "Y", "Z"]
+    let letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", 
+        "P", "Q", "R", "S", "T", "U", "V", "X", "Y", "Z"]
     let options = `<p class="active" onclick="changeSelection('name-search', 'TODOS')">TODOS</p>`
 
     for (let l in letters) {
@@ -632,7 +630,7 @@ async function sendSearch() {
     document.getElementById("search-button").style.cursor = "not-allowed"
 
     let result = await getPokemonBy(letter, type, color, order, typeOrder) // Realizar busqueda
-    
+
     if (result.result) {
         showHideSearch()
         $("#search-result").html("")
@@ -644,9 +642,9 @@ async function sendSearch() {
 }
 
 // Funcion para buscar pokemon, segun los parametros solicitados
-async function getPokemonBy(letter = "TODOS", type = "TODOS", color = "TODOS", order = "POR NUMERO ENTRADA", typeOrder = "ASCENDENTE") {
+async function getPokemonBy(letter, type, color, order, typeOrder) {
     // Realizar la peticion y obtener la data con todos los pokemon de hoenn
-    let listPokemon = await performApiQuery(`${URLAPI}/pokedex/hoenn`)
+    let listPokemon = await performApiQuery(`${URLAPI}pokedex/hoenn`)
     // Crear un listado donde se almacena el nombre y el numero de la entrada de cada pokemon
     listPokemon = listPokemon.pokemon_entries.map(pokemon => {
         return { pokemon_species: { name: pokemon.pokemon_species.name }, entry_number: pokemon.entry_number }
@@ -658,22 +656,24 @@ async function getPokemonBy(letter = "TODOS", type = "TODOS", color = "TODOS", o
     // Recorrer todos los pokemon
     for (let pokemon in listPokemon) {
 
+        let name = listPokemon[pokemon].pokemon_species.name
+
         if (letter != "TODOS") { // Si se busca el pokemon por la primera letra del nombre
-            if (listPokemon[pokemon].pokemon_species.name.startsWith(letter.toLowerCase())) searchListByLetter.push(listPokemon[pokemon])
+            if (name.startsWith(letter.toLowerCase())) searchListByLetter.push(listPokemon[pokemon])
         }
 
         if (type != "TODOS") { // Si se busca el pokemon por los tipos
             let listPokemonByType = await performApiQuery(`${URLAPI}/type/${type.toLowerCase()}`)
             listPokemonByType = listPokemonByType.pokemon.map(pokemon => pokemon.pokemon.name)
 
-            if (listPokemonByType.includes(listPokemon[pokemon].pokemon_species.name)) searchListByType.push(listPokemon[pokemon])
+            if (listPokemonByType.includes(name)) searchListByType.push(listPokemon[pokemon])
         }
 
         if (color != "TODOS") { // Si se busca el pokemon por el color
             let listPokemonByColor = await performApiQuery(`${URLAPI}/pokemon-color/${color.toLowerCase()}`)
             listPokemonByColor = listPokemonByColor.pokemon_species.map(pokemon => pokemon.name)
 
-            if (listPokemonByColor.includes(listPokemon[pokemon].pokemon_species.name)) searchListByColor.push(listPokemon[pokemon])
+            if (listPokemonByColor.includes(name)) searchListByColor.push(listPokemon[pokemon])
         }
     }
     if (searchListByLetter.length >= 1) { // Si se obtuvieron registros por letra
