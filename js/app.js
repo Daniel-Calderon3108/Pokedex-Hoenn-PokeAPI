@@ -1,6 +1,7 @@
 // URL de la api a consumir
 const URLAPI = "https://pokeapi.co/api/v2/"
 let position = 0 // Saber en que posicion de la lista nos encontramos
+let language = "es" // Cambiar el idioma
 
 $(document).ready(function () {
     // Función que se encarga de crear la lista de los pokemon
@@ -198,22 +199,22 @@ async function getInfoPokemon(name, id, newPosition = null) {
 
     let typePokemon = ``
     let abilitiesPokemon = ``
-    let heldItemsPokemon = DATA.held_items.length == 0 ? `NOTHING,` : ``
+    let heldItemsPokemon = DATA.held_items.length == 0 ? `NADA,` : ``
 
     // Recorremos los tipos que tiene el pokemon
     for (let i = 0; i < DATA.types.length; i++) {
         let type = DATA.types[i].type.name
-        typePokemon += `<span class="${type}">${type.toUpperCase()}</span>`
+        typePokemon += `<span class="${type}">${await getTranslate(type, "type")}</span>`
     }
 
     // Recorremos todas las habilidades que tiene el pokemon
     for (let i = 0; i < DATA.abilities.length; i++) {
-        abilitiesPokemon += DATA.abilities[i].ability.name.toUpperCase() + ","
+        abilitiesPokemon += await getTranslate(DATA.abilities[i].ability.name, "ability") + ","
     }
 
     // Recorremos todos los objetos que puede soltar el pokemon
     for (let i = 0; i < DATA.held_items.length; i++) {
-        heldItemsPokemon += DATA.held_items[i].item.name.toUpperCase() + ","
+        heldItemsPokemon += await getTranslate(DATA.held_items[i].item.name, "item") + ","
     }
 
     // Obtenemos la descripcion del pokemon
@@ -236,7 +237,7 @@ async function getInfoPokemon(name, id, newPosition = null) {
     }
 
     // Pintamos todos los movimientos obtenidos
-    printAllMoves(movs)
+    await printAllMoves(movs)
 
     // Pintamos todas las stats del pokemon
     printStatsPokemon(DATA.stats)
@@ -266,7 +267,7 @@ async function getDescriptionPokemon(name) {
 
     // Recorremos todas las entradas y guardamos la entrada, que sea en ingles y del juego de esmeralda
     for (let i = 0; i < entries.length; i++) {
-        if (entries[i].language.name == "en" && entries[i].version.name == "emerald") description = `<p>${entries[i].flavor_text}</p>`
+        if (entries[i].language.name == language && entries[i].version.name == "omega-ruby") description = `<p>${entries[i].flavor_text}</p>`
     }
 
     // Obtenemos todos los numeros en la pokedex del pokemon
@@ -293,7 +294,7 @@ async function getMovePokemon(url, move_learn_method, level) {
     const DATA = await performApiQuery(url)
 
     return {
-        name : DATA.name, // Obtenemos el nombre del movimiento
+        name : DATA.names.find(move => move.language.name == language).name, // Obtenemos el nombre del movimiento
         category : DATA.damage_class.name, // Obtenemos la categoria a la que pertenece el movimiento
         type : DATA.type.name, // Obtenemos el tipo del movimiento
         move_learn_method : move_learn_method, // Obtenemos el metodo por el cual el pokemon puede aprender el movimiento
@@ -302,7 +303,7 @@ async function getMovePokemon(url, move_learn_method, level) {
 }
 
 // Funcion que se encarga de clasificar y pintar los movimientos de los pokemon
-function printAllMoves(movs) {
+async function printAllMoves(movs) {
 
     // Ordenar movimientos por nivel
     movs.sort((a, b) => a.level - b.level);
@@ -356,7 +357,7 @@ function printAllMoves(movs) {
                             <tr>
                                 <td>${movs[i].name.toUpperCase()}</td>
                                 ${typeLevel}
-                                <td><span class="${movs[i].type}">${movs[i].type.toUpperCase()}</span></td>
+                                <td><span class="${movs[i].type}">${await getTranslate(movs[i].type,"type")}</span></td>
                                 <td><img src="img/${movs[i].category}.gif"></td>
                             </tr>
                             `
@@ -572,10 +573,10 @@ function changeSectionSearch(section) {
 function printLetter() {
     let letters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", 
         "P", "Q", "R", "S", "T", "U", "V", "X", "Y", "Z"]
-    let options = `<p class="active" onclick="changeSelection('name-search', 'TODOS')">TODOS</p>`
+    let options = `<p class="active" onclick="changeSelection('name-search', 'TODOS', 'TODOS')">TODOS</p>`
 
     for (let l in letters) {
-        options += `<p onclick="changeSelection('name-search', '${letters[l]}')">${letters[l]}</p>`
+        options += `<p onclick="changeSelection('name-search', '${letters[l]}', '${letters[l]}')">${letters[l]}</p>`
     }
 
     $("#name-search-select").html(options)
@@ -583,11 +584,22 @@ function printLetter() {
 
 // Funcion para imprimir los colores
 function printColor() {
-    let colors = ["RED", "BLUE", "YELLOW", "GREEN", "BLACK", "BROWN", "PURPLE", "GRAY", "WHITE", "PINK"]
-    let options = `<p class="active" onclick="changeSelection('color-search', 'TODOS')">TODOS</p>`
+    let colors = {
+        RED: "ROJO", 
+        BLUE: "AZUL", 
+        YELLOW: "AMARILLO", 
+        GREEN: "VERDE",
+        BLACK: "NEGRO", 
+        BROWN: "CAFÉ",
+        PURPLE: "MORADO", 
+        GRAY: "GRIS", 
+        WHITE: "BLANCO", 
+        PINK: "ROSADO"
+    }
+    let options = `<p class="active" onclick="changeSelection('color-search', 'TODOS', 'TODOS')">TODOS</p>`
 
     for (let c in colors) {
-        options += `<p onclick="changeSelection('color-search', '${colors[c]}')">${colors[c]}</p>`
+        options += `<p onclick="changeSelection('color-search', '${c}', '${colors[c]}')">${colors[c]}</p>`
     }
 
     $("#color-search-select").html(options)
@@ -595,21 +607,39 @@ function printColor() {
 
 // Funcion para imprimir los tipos
 function printTypes() {
-    let types = ["STEEL", "WATER", "BUG", "DRAGON", "ELECTRIC", "GHOST", "FIRE", "FAIRY", "ICE",
-        "FIGHTING", "NORMAL", "GRASS", "PSYCHIC", "ROCK", "DARK", "GROUND", "POISON", "FLYING"]
-    let options = `<p class="active" onclick="changeSelection('type-search', 'TODOS')">TODOS</p>`
+    let types = {
+        STEEL: "ACERO", 
+        WATER: "AGUA", 
+        BUG: "BICHO",
+        DRAGON: "DRAGON", 
+        ELECTRIC: "ELÉCTRICO", 
+        GHOST: "FANTASMA", 
+        FIRE: "FUEGO", 
+        FAIRY: "HADA", 
+        ICE: "HIELO",
+        FIGHTING: "LUCHA", 
+        NORMAL: "NORMAL", 
+        GRASS: "PLANTA", 
+        PSYCHIC: "PSÍQUICO", 
+        ROCK: "ROCA", 
+        DARK: "SINIESTRO", 
+        GROUND: "TIERRA", 
+        POISON: "VENENO", 
+        FLYING: "VOLADOR"}
+    let options = `<p class="active" onclick="changeSelection('type-search', 'TODOS', 'TODOS')">TODOS</p>`
 
     for (let t in types) {
-        options += `<p onclick="changeSelection('type-search', '${types[t]}')">${types[t]}</p>`
+        options += `<p onclick="changeSelection('type-search', '${t}', '${types[t]}')">${types[t]}</p>`
     }
 
     $("#type-search-select").html(options)
 }
 
 // Funcion para cambiar el valor de buscar pokemon
-function changeSelection(section, value) {
+function changeSelection(section, key, value) {
 
     $(`#${section}`).val(value)
+    $(`#${section}-value`).val(key)
     let options = document.getElementById(`${section}-select`).children
 
     for (let i = 0; i < options.length; i++) {
@@ -620,11 +650,11 @@ function changeSelection(section, value) {
 // Funcion para realizar la busqueda y cerrar el panel de busqueda
 async function sendSearch() {
     // Capturar valores
-    let letter = document.getElementById("name-search").value
-    let type = document.getElementById("type-search").value
-    let color = document.getElementById("color-search").value
-    let order = document.getElementById("order-search").value
-    let typeOrder = document.getElementById("type-order-search").value
+    let letter = document.getElementById("name-search-value").value
+    let type = document.getElementById("type-search-value").value
+    let color = document.getElementById("color-search-value").value
+    let order = document.getElementById("order-search-value").value
+    let typeOrder = document.getElementById("type-order-search-value").value
 
     $("#search-result").html("Realizando Busqueda...")
     document.getElementById("search-button").style.cursor = "not-allowed"
@@ -652,6 +682,7 @@ async function getPokemonBy(letter, type, color, order, typeOrder) {
     let searchListByLetter = []
     let searchListByType = []
     let searchListByColor = []
+    let validateLetter = 0
 
     // Recorrer todos los pokemon
     for (let pokemon in listPokemon) {
@@ -659,7 +690,7 @@ async function getPokemonBy(letter, type, color, order, typeOrder) {
         let name = listPokemon[pokemon].pokemon_species.name
 
         if (letter != "TODOS") { // Si se busca el pokemon por la primera letra del nombre
-            if (name.startsWith(letter.toLowerCase())) searchListByLetter.push(listPokemon[pokemon])
+            if (name.startsWith(letter.toLowerCase())) { searchListByLetter.push(listPokemon[pokemon]) } else { validateLetter++ }
         }
 
         if (type != "TODOS") { // Si se busca el pokemon por los tipos
@@ -676,38 +707,50 @@ async function getPokemonBy(letter, type, color, order, typeOrder) {
             if (listPokemonByColor.includes(name)) searchListByColor.push(listPokemon[pokemon])
         }
     }
-    if (searchListByLetter.length >= 1) { // Si se obtuvieron registros por letra
-        listPokemon = listPokemon.filter(pokemon => searchListByLetter.includes(pokemon)) // Filtrar pokemon
-    }
 
-    if (searchListByType.length >= 1) { // Si se obtuvieron registros por tipo
-        listPokemon = listPokemon.filter(pokemon => searchListByType.includes(pokemon)) // Filtrar pokemon
-    }
-
-    if (searchListByColor.length >= 1) { // Si se obtuvieron registros por tipo
-        listPokemon = listPokemon.filter(pokemon => searchListByColor.includes(pokemon)) // Filtrar pokemon
-    }
-
-    if (order != null) { // Si se desea ordenar los datos por:
-        if (order == "POR NUMERO ENTRADA") { // Por numero de entrada
-            typeOrder == "ASCENDENTE" // Ascendente o Descendente
-                ? listPokemon.sort((a, b) => a.entry_number - b.entry_number)
-                : listPokemon.sort((a, b) => b.entry_number - a.entry_number)
+    if (validateLetter != listPokemon.length) {
+        if (searchListByLetter.length >= 1 && validateLetter) { // Si se obtuvieron registros por letra
+            listPokemon = listPokemon.filter(pokemon => searchListByLetter.includes(pokemon)) // Filtrar pokemon
         }
-
-        if (order == "POR NOMBRE") { // Por nombre de pokemon
-            typeOrder == "ASCENDENTE" // Ascendente o Descendente
-                ? listPokemon.sort((a, b) => a.pokemon_species.name.localeCompare(b.pokemon_species.name))
-                : listPokemon.sort((a, b) => b.pokemon_species.name.localeCompare(a.pokemon_species.name))
+    
+        if (searchListByType.length >= 1) { // Si se obtuvieron registros por tipo
+            listPokemon = listPokemon.filter(pokemon => searchListByType.includes(pokemon)) // Filtrar pokemon
         }
+    
+        if (searchListByColor.length >= 1) { // Si se obtuvieron registros por tipo
+            listPokemon = listPokemon.filter(pokemon => searchListByColor.includes(pokemon)) // Filtrar pokemon
+        }
+    
+        if (order != null) { // Si se desea ordenar los datos por:
+            if (order == "POR NUMERO ENTRADA") { // Por numero de entrada
+                typeOrder == "ASCENDENTE" // Ascendente o Descendente
+                    ? listPokemon.sort((a, b) => a.entry_number - b.entry_number)
+                    : listPokemon.sort((a, b) => b.entry_number - a.entry_number)
+            }
+    
+            if (order == "POR NOMBRE") { // Por nombre de pokemon
+                typeOrder == "ASCENDENTE" // Ascendente o Descendente
+                    ? listPokemon.sort((a, b) => a.pokemon_species.name.localeCompare(b.pokemon_species.name))
+                    : listPokemon.sort((a, b) => b.pokemon_species.name.localeCompare(a.pokemon_species.name))
+            }
+        }
+    } else {
+        return { result: false, message: "No se encontraron resultados." }
     }
 
     // Validar si se encontro algun pokemon con los parametros establecidos
     if (listPokemon.length > 0) {
         await printPokemonList(listPokemon)
         position = 0 // Resetear lista 
-        return { result: true, message: "OK" }
+        return { result: true, message: "OK", listPokemon }
     }
 
     return { result: false, message: "No se encontraron resultados." }
+}
+
+// Funcion para traducir
+async function getTranslate(word, typeWord) {
+    const DATA = await performApiQuery(`${URLAPI}${typeWord}/${word}`)
+
+    return DATA.names.find(pokemon => pokemon.language.name == language).name.toUpperCase()
 }

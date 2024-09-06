@@ -178,30 +178,46 @@
             </nav>
             <section class="container-search-principal">
                 <section class="container-search">
-                    <div class="button" onclick="changeSectionSearch('name-search-select')">
+                    <div class="button"
+                        onclick="changeSectionSearch('name-search-select')">
                         <p>NOMBRE</p>
-                        <input type="text" id="name-search" readonly="true"
+                        <input type="text" id="name-search"
+                            readonly="true"
+                            value="TODOS">
+                        <input type="hidden" id="name-search-value"
                             value="TODOS">
                     </div>
-                    <div class="button" onclick="changeSectionSearch('color-search-select')">
+                    <div class="button"
+                        onclick="changeSectionSearch('color-search-select')">
                         <p>COLOR</p>
                         <input type="text" id="color-search" readonly="true"
                             value="TODOS">
+                        <input type="hidden" id="color-search-value"
+                            value="TODOS">
                     </div>
-                    <div class="button" onclick="changeSectionSearch('type-search-select')">
+                    <div class="button"
+                        onclick="changeSectionSearch('type-search-select')">
                         <p>TIPO</p>
                         <input type="text" id="type-search" readonly="true"
                             value="TODOS">
+                        <input type="hidden" id="type-search-value"
+                            value="TODOS">
                     </div>
-                    <div class="button" onclick="changeSectionSearch('order-search-select')">
+                    <div class="button"
+                        onclick="changeSectionSearch('order-search-select')">
                         <p>ORDEN</p>
                         <input type="text" id="order-search" readonly="true"
                             value="POR NUMERO ENTRADA">
+                        <input type="hidden" id="order-search-value"
+                            value="POR NUMERO ENTRADA">
                     </div>
-                    <div class="button" onclick="changeSectionSearch('type-order-search-select')">
+                    <div class="button"
+                        onclick="changeSectionSearch('type-order-search-select')">
                         <p>TIPO ORDEN</p>
                         <input type="text" id="type-order-search"
                             readonly="true" value="ASCENDENTE">
+                        <input type="hidden" id="type-order-search-value"
+                            value="ASCENDENTE">
                     </div>
                     <div class="button">
                         <p id="search-button" onclick="sendSearch()">BUSCAR</p>
@@ -211,22 +227,29 @@
                 <section class="container-info">
                     <div class="search-info" id="search-info">
                         <section id="name-search-select"></section>
-                        <section id="color-search-select" class="hide">POR COLOR</section>
-                        <section id="type-search-select" class="hide">POR TIPO</section>
+                        <section id="color-search-select" class="hide">POR
+                            COLOR</section>
+                        <section id="type-search-select" class="hide">POR
+                            TIPO</section>
                         <section id="order-search-select" class="hide">
-                            <p class="active" onclick="changeSelection('order-search','POR NUMERO ENTRADA')">POR NUMERO ENTRADA</p>
-                            <p onclick="changeSelection('order-search','POR NOMBRE')">POR NOMBRE</p>
+                            <p class="active"
+                                onclick="changeSelection('order-search','POR NUMERO ENTRADA','POR NUMERO ENTRADA')">POR NUMERO ENTRADA</p>
+                            <p
+                                onclick="changeSelection('order-search','POR NOMBRE','POR NOMBRE')">POR NOMBRE</p>
                         </section>
                         <section id="type-order-search-select" class="hide">
-                            <p class="active" onclick="changeSelection('type-order-search', 'ASCENDENTE')">ASCENDENTE</p>
-                            <p onclick="changeSelection('type-order-search','DESCENDENTE')">DESCENDENTE</p>
+                            <p class="active"
+                                onclick="changeSelection('type-order-search', 'ASCENDENTE','ASCENDENTE')">ASCENDENTE</p>
+                            <p
+                                onclick="changeSelection('type-order-search','DESCENDENTE','DESCENDENTE')">DESCENDENTE</p>
                         </section>
                     </div>
                 </section>
             </section>
             <section class="description">
                 <div class="left"></div>
-                <div class="center" id="description-search">Buscar pokemon por los parametros establecidos.</div>
+                <div class="center" id="description-search">Buscar pokemon por
+                    los parametros establecidos.</div>
                 <div class="right"></div>
             </section>
         </section>
